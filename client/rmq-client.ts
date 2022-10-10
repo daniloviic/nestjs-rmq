@@ -209,7 +209,7 @@ export class RMQClient extends ClientRMQ {
       return this.dispatchToDirectExchange(serializedPacket, options);
     }
     // Dispatch to a fanout exchange
-    else if (this.exchangeType === ExchangeType.FANOUT) {
+    else {
       return this.dispatchToFanoutExchange(serializedPacket, options);
     }
   }

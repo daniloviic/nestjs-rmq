@@ -1,5 +1,6 @@
 import { ClientOptions, Closeable } from '@nestjs/microservices';
 
+// RMQ Client
 import { RMQClient } from './rmq-client';
 
 export class RMQClientFactory {

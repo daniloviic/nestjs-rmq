@@ -25,10 +25,8 @@ export class RMQServer extends ServerRMQ implements CustomTransportStrategy {
   constructor(protected readonly options: RmqOptions['options']) {
     super(options);
 
-    this.exchangeOptions =
-      this.getOptionsProp(options, 'exchangeOptions') || {};
-    this.exchangeType =
-      this.getOptionsProp(options, 'exchangeType') || ExchangeType.DIRECT;
+    this.exchangeOptions = options?.exchangeOptions || {};
+    this.exchangeType = options?.exchangeType || ExchangeType.DIRECT;
   }
 
   /**
@@ -39,7 +37,7 @@ export class RMQServer extends ServerRMQ implements CustomTransportStrategy {
    */
   public async setupChannel(channel: Channel, callback: any): Promise<void> {
     // Acknowledgement mode.
-    const noAck = this.getOptionsProp(this.options, 'noAck', RQM_DEFAULT_NOACK);
+    const noAck = this.options?.noAck || RQM_DEFAULT_NOACK;
     let queue: Replies.AssertQueue;
 
     // Setup a direct exchange.
@@ -47,7 +45,7 @@ export class RMQServer extends ServerRMQ implements CustomTransportStrategy {
       queue = await this.setupDirectExchange(channel);
     }
     // Setup a fanout exchange
-    else if (this.exchangeType === ExchangeType.FANOUT) {
+    else {
       queue = await this.setupFanoutExchange(channel);
     }
 
@@ -61,7 +59,12 @@ export class RMQServer extends ServerRMQ implements CustomTransportStrategy {
     channel.consume(
       queue.queue,
       // Pass the message to the built in server to handle it.
-      (msg: Record<string, any>) => this.handleMessage(msg, channel),
+      (msg: Record<string, any> | null) => {
+        if (!msg) {
+          return;
+        }
+        this.handleMessage(msg, channel);
+      },
       {
         noAck,
       },

@@ -1,14 +1,14 @@
-import { DynamicModule, Module, OnApplicationShutdown } from "@nestjs/common";
+import { DynamicModule, Module, OnApplicationShutdown } from '@nestjs/common';
 import {
   ClientProxy,
   ClientsModuleOptions,
   ClientProviderOptions,
   ClientsModuleAsyncOptions,
   Closeable,
-} from "@nestjs/microservices";
+} from '@nestjs/microservices';
 
 // Factory
-import { RMQClientFactory } from "./rmq-client-factory";
+import { RMQClientFactory } from './rmq-client-factory';
 
 @Module({})
 export class RMQClientModule {
@@ -36,13 +36,15 @@ export class RMQClientModule {
    * @returns The registered module.
    */
   static async registerAsync(
-    options: ClientsModuleAsyncOptions
+    options: ClientsModuleAsyncOptions,
   ): Promise<DynamicModule> {
-    let imports = [];
-    const clients = [];
+    let imports: any[] = [];
+    const clients: any[] = [];
 
     for (const item of options || []) {
-      imports = [...imports, ...item.imports];
+      if (item.imports) {
+        imports = [...imports, ...item.imports];
+      }
 
       // Create the options for the provider.
       const providerOptions = `${String(item.name)}_OPTIONS`;
